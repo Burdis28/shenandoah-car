@@ -44,7 +44,7 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
-    private A090_MS_TIME = 840
+    private A090_MS_TIME = 850
     private A045_MS_TIME = 1000
 
     private initDrivingSections() {
@@ -97,10 +97,9 @@ class ShenandoahCar {
 
     /**
      * Rotates by a given angle
-     * @angle in [deg]
+     * @angle in [deg] right now only supported angles {-45,45,-90,90}
      */
-    turn(angle: number) {
-        RingbitCar.init_wheel(AnalogPin.P1, AnalogPin.P2)
+    turn(angle: number) {        
         if (angle == 90) {
             RingbitCar.freestyle(50, -46)
             basic.pause(840)
@@ -109,6 +108,16 @@ class ShenandoahCar {
         } else if (angle == -90) {
             RingbitCar.freestyle(-50, 46)
             basic.pause(840)
+            RingbitCar.brake()
+            basic.pause(200)
+        } else if (angle == 45) {
+            RingbitCar.freestyle(50, -46)
+            basic.pause(475)
+            RingbitCar.brake()
+            basic.pause(200)
+        } else if (angle == -45) {
+            RingbitCar.freestyle(-50, 46)
+            basic.pause(475)
             RingbitCar.brake()
             basic.pause(200)
         } else {
@@ -147,16 +156,16 @@ input.onButtonPressed(Button.B, function () {
 
 input.onButtonPressed(Button.A, function () {
     car.drive(50)
-    RingbitCar.freestyle(50, -46)
-    basic.pause(440)
+    RingbitCar.freestyle(-50, 46)
+    basic.pause(470)
     RingbitCar.brake()
     car.drive(50)
 })
 
 input.onButtonPressed(Button.B, function () {
     car.drive(50)
-    RingbitCar.freestyle(50, -46)
-    basic.pause(420)
+    RingbitCar.freestyle(-50, 46)
+    basic.pause(460)
     RingbitCar.brake()
     car.drive(50)
 })
