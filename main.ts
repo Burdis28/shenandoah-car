@@ -43,7 +43,7 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
-    private A090_MS_TIME = 1000
+    private A090_MS_TIME = 840
     private A045_MS_TIME = 1000
 
     private initDrivingSections() {
@@ -88,6 +88,7 @@ class ShenandoahCar {
             RingbitCar.freestyle(section.getLeftWheelSpd(), section.getRightWheelSpd())
             basic.pause(section.getDrivingTime())
             RingbitCar.brake()
+            basic.pause(200)
         }
         return rest
     }
@@ -101,6 +102,12 @@ class ShenandoahCar {
             RingbitCar.freestyle(50, -46)
             basic.pause(840)
             RingbitCar.brake()
+            basic.pause(200)
+        } else if (angle == -90) {
+            RingbitCar.freestyle(-50, 46)
+            basic.pause(840)
+            RingbitCar.brake()
+            basic.pause(200)
         } else {
             basic.showIcon(IconNames.No)
         }
@@ -134,11 +141,11 @@ input.onButtonPressed(Button.B, function () {
     RingbitCar.brake()
 })
 */
-/*
+
 input.onButtonPressed(Button.A, function () {
     car.drive(50)
-    RingbitCar.freestyle(10, -8)
-    basic.pause(2250)
+    RingbitCar.freestyle(50, -46)
+    basic.pause(440)
     RingbitCar.brake()
     car.drive(50)
 })
@@ -146,8 +153,7 @@ input.onButtonPressed(Button.A, function () {
 input.onButtonPressed(Button.B, function () {
     car.drive(50)
     RingbitCar.freestyle(50, -46)
-    basic.pause(840)
+    basic.pause(420)
     RingbitCar.brake()
     car.drive(50)
 })
-*/
