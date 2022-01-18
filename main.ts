@@ -1,3 +1,28 @@
+class DrivingSection {
+    private key: number
+    private leftWheelSpd: number
+    private rightWheelSpd: number
+    private drivingTime: number
+    constructor(key: number, left: number, right: number, time: number) {
+        this.key = key;
+        this.leftWheelSpd = left;
+        this.rightWheelSpd = right;
+        this.drivingTime = time;
+    }
+    getKey() {
+        return this.key
+    }
+    getLeftWheelSpd() {
+        return this.leftWheelSpd
+    }
+    getRightWheelSpd() {
+        return this.rightWheelSpd
+    }
+    getDrivingTime() {
+        return this.drivingTime
+    }
+}
+
 class ShenandoahCar {
     
     /* Driving Mode */
@@ -11,14 +36,25 @@ class ShenandoahCar {
     private D020_HS_TIME = 290
     private D010_HS_TIME = 225
     private D010_QT_TIME = 450
+
+    private directDriveSections: DrivingSection[]
     
     /* Rotation */
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -45
 
+    private initDrivingSections() {
+        this.directDriveSections = []
+        this.directDriveSections[100] = new DrivingSection(100, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D100_HS_TIME)
+        this.directDriveSections[50]  = new DrivingSection( 50, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D050_HS_TIME)
+        this.directDriveSections[20]  = new DrivingSection( 20, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D020_HS_TIME)
+        this.directDriveSections[10]  = new DrivingSection( 10, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D010_HS_TIME)                        
+    }
+
     constructor() {
         RingbitCar.init_wheel(AnalogPin.P1, AnalogPin.P2)
+        this.initDrivingSections()
     }
 
     /**
@@ -26,7 +62,22 @@ class ShenandoahCar {
      * @distance in [mm]
      */
     drive(distance: number) {
-        
+        let rest = distance
+        this.directDriveSections.forEach(function (section: DrivingSection, key: number){
+            rest = this.drivingSection(rest, section)
+        })
+    }
+
+    driveSection(distance: number, section: DrivingSection) { 
+        let numSections = Math.floor(distance / section.getKey())
+        let rest = distance % section.getKey()
+        console.log("[" + section.getKey() + "]: " + numSections + " (" + rest + ")")
+
+        for (let i = 0; i < numSections; i++) {
+            RingbitCar.freestyle(section.getLeftWheelSpd(), section.getRightWheelSpd())
+            basic.pause(section.getDrivingTime())
+        }
+        return rest
     }
 
     /**
@@ -36,6 +87,8 @@ class ShenandoahCar {
     turn(angle: number) {
 
     }
+
+    
 
     private drive_100() {
         RingbitCar.freestyle(this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD)
