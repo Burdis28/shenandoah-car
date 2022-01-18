@@ -26,7 +26,7 @@ class ShenandoahCar {
      * @distance in [mm]
      */
     drive(distance: number) {
-
+        
     }
 
     /**
