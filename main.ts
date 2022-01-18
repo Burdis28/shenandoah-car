@@ -77,7 +77,7 @@ class ShenandoahCar {
         })
     }
 
-    driveSection(distance: number, section: DrivingSection) { 
+    private driveSection(distance: number, section: DrivingSection) { 
         let numSections = Math.floor(distance / section.getKey())
         let rest = distance % section.getKey()
         console.log("[" + section.getKey() + "]: " + numSections + " (" + rest + ")")
@@ -99,7 +99,7 @@ class ShenandoahCar {
     }
 
 }
-
+/*
 let car = new ShenandoahCar()
 
 input.onButtonPressed(Button.A, function () {
@@ -113,3 +113,4 @@ input.onButtonPressed(Button.A, function () {
 input.onButtonPressed(Button.B, function () {
     RingbitCar.brake()
 })
+*/
