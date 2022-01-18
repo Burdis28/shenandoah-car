@@ -36,6 +36,7 @@ class ShenandoahCar {
     private D020_HS_TIME = 290
     private D010_HS_TIME = 225
     private D010_QT_TIME = 450
+    private D005_QT_TIME = 225
 
     private directDriveSections = [{}]
     
@@ -47,11 +48,12 @@ class ShenandoahCar {
     private A045_MS_TIME = 1000
 
     private initDrivingSections() {
-        let tmpArray = []
+        let tmpArray  = []
         tmpArray[100] = new DrivingSection(100, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D100_HS_TIME)
         tmpArray[50]  = new DrivingSection( 50, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D050_HS_TIME)
         tmpArray[20]  = new DrivingSection( 20, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D020_HS_TIME)
-        tmpArray[10]  = new DrivingSection( 10, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D010_HS_TIME)
+        tmpArray[10]  = new DrivingSection( 10, this.LEFT_QUARTER_SPD, this.RIGHT_QUARTER_SPD, this.D010_QT_TIME)
+        tmpArray[5]   = new DrivingSection(  5, this.LEFT_QUARTER_SPD, this.RIGHT_QUARTER_SPD, this.D005_QT_TIME)
         /*tmpArray = [
             { key: 100, left: this.LEFT_HALF_SPD, right: this.RIGHT_HALF_SPD, time: this.D100_HS_TIME },
             { key: 50, left: this.LEFT_HALF_SPD, right: this.RIGHT_HALF_SPD, time: this.D050_HS_TIME },
