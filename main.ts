@@ -100,6 +100,7 @@ class ShenandoahCar {
      * @angle in [deg]
      */
     turn(angle: number) {
+        RingbitCar.init_wheel(AnalogPin.P1, AnalogPin.P2)
         if (angle == 90) {
             RingbitCar.freestyle(50, -46)
             basic.pause(840)
