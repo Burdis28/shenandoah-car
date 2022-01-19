@@ -254,7 +254,7 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
-    private A90_MS_CLOCK = 680
+    private A90_MS_CLOCK = 690
     private A45_MS_CLOCK = 380
     private A90_MS_ANTI = 660
     private A45_MS_ANTI = 360
