@@ -118,10 +118,10 @@ class CompassHistory {
         this.correction.addAngle(angle);
     }
     /**
-     * Returns angle with correction
+     * Returns azimuth angle with correction
      * @dec number of decimal places
      */
-    getDelta(dec: number) {
+    getAzimuth(dec: number) {
         if (this.getLength() < 1) return -100;
         let sum = 0;
         this.history.forEach(function (e) {
@@ -131,12 +131,56 @@ class CompassHistory {
         logValue("d", delta2)
         return delta2;
     }
-    fullCalibration() {
+    private shiftCompassIcon(i: number) {        
+        if (i % 500 == 0) {
+            basic.showLeds(`
+            . # . # .
+            # . . . #
+            . . . . .
+            # . . . #
+            . # . # .
+            `)
+            return
+        } 
+        if (i % 400 == 0) {
+            basic.showIcon(IconNames.Diamond)
+            return
+        }
+         if (i % 300 == 0) {
+            basic.showIcon(IconNames.SmallDiamond)
+             return
+        }
+        if (i % 200 == 0) {
+            basic.showLeds(`
+            . . . . .
+            . . . . .
+            . . # . .
+            . . . . .
+            . . . . .
+            `)
+            return
+        }
+        if (i % 100 == 0) {
+            basic.clearScreen()
+            return
+        } 
+    }
+    fullCalibration(icon?: boolean) {
         this.reset()
         for (let j = 0; j < this.maxEntries; j++) {
+            if (icon) {
+                this.shiftCompassIcon(j)
+            }
             this.append(input.compassHeading())
             basic.pause(this.compassTick)
         }
+        if (icon) {
+            basic.clearScreen()
+        }        
+    }
+    getCalibratedAzimuth(dec: number, icon?: boolean) {
+        this.fullCalibration(icon)
+        return this.getAzimuth(dec)
     }
     getFromRow() {
         if (this.history.length > 0) {
@@ -210,14 +254,17 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
-    private A90_MS_CLOCK = 840
-    private A45_MS_CLOCK = 475
-    private A90_MS_ANTI = 750
-    private A45_MS_ANTI = 460
+    private A90_MS_CLOCK = 680
+    private A45_MS_CLOCK = 380
+    private A90_MS_ANTI = 660
+    private A45_MS_ANTI = 360
 
     /* Calibration Mode */
 
-    private compassCalibration = false;
+    private compassCalibration: boolean
+    private DECIMAL = 1
+    private ANGLE_ACC = 2
+    private liveCalibration: CompassHistory
 
     private initDrivingSections() {
         let tmpArray  = []
@@ -243,6 +290,7 @@ class ShenandoahCar {
         RingbitCar.init_wheel(AnalogPin.P1, AnalogPin.P2)
         this.initDrivingSections()
         this.compassCalibration = calibration
+        this.liveCalibration = new CompassHistory(100, 20)
     }
 
     /**
@@ -280,6 +328,22 @@ class ShenandoahCar {
             rest = this.driveSection(rest, section)
         })
     }
+
+    calibratedTurn(angle:number) {
+        let startAzimuth = this.liveCalibration.getCalibratedAzimuth(this.DECIMAL)
+        let finalAzimuth = (startAzimuth + angle) % 360
+        this.turn(angle)
+        let actualAzimuth = this.liveCalibration.getCalibratedAzimuth(this.DECIMAL)
+        if (Math.abs((actualAzimuth - startAzimuth) % 360) <= this.ANGLE_ACC) {
+            return
+        }
+
+    }
+
+    private calibrateAngle(finalAzimuth: number, actualAzimuth: number) {
+        let deltaAngle = finalAzimuth - actualAzimuth
+    }
+
     private driveSection(distance: number, section: DrivingSection) {
         let numSections = Math.floor(distance / section.getKey())
         let rest = distance % section.getKey()
