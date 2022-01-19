@@ -329,6 +329,29 @@ class ShenandoahCar {
         })
     }
 
+    /**
+     * Returns delta Azimuth as: base minus sub
+     */
+    private subtractAsAzimuth(base: number, sub: number) {
+        let tmp = (base - sub) % 360
+        if (tmp < 0) {
+            tmp = tmp+360
+        }
+        return tmp
+    }
+
+    private addAsAzimuth(a: number, b: number) {
+        let tmp = (a + b) % 360
+        if (tmp < 0) {
+            tmp = tmp + 360
+        }
+        return tmp
+    }
+
+    private substractAsAngle(base: number, sub: number) {
+        return (base - sub) % 360
+    }
+
     calibratedTurn(angle:number) {
         let startAzimuth = this.liveCalibration.getCalibratedAzimuth(this.DECIMAL)
         let finalAzimuth = (startAzimuth + angle) % 360
@@ -337,11 +360,20 @@ class ShenandoahCar {
         if (Math.abs((actualAzimuth - startAzimuth) % 360) <= this.ANGLE_ACC) {
             return
         }
-
+        this.calibratedAngle(finalAzimuth, startAzimuth)
     }
 
-    private calibrateAngle(finalAzimuth: number, actualAzimuth: number) {
-        let deltaAngle = finalAzimuth - actualAzimuth
+    private calibratedAngle(finalAzimuth: number, actualAzimuth: number) {
+        let deltaAngle = this.substractAsAngle(finalAzimuth, actualAzimuth)
+        let leftRot = this.LEFT_QUARTER_SPD
+        let rightRot = -1 * this.RIGHT_QUARTER_SPD
+        if (deltaAngle < 0) {
+            leftRot = -1 * this.LEFT_QUARTER_SPD
+            rightRot = this.RIGHT_QUARTER_SPD
+        }
+        RingbitCar.freestyle(leftRot, rightRot)
+        basic.pause(20 * deltaAngle)
+        RingbitCar.brake()
     }
 
     private driveSection(distance: number, section: DrivingSection) {
