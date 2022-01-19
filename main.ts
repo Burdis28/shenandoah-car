@@ -414,7 +414,7 @@ class ShenandoahCar {
             rightRot = this.RIGHT_QUARTER_SPD
         }
         let rest = 0
-        let sections = [{}]
+        let sections = []
         if (deltaAngle == 0) { return }
         if (deltaAngle > 0) {
             sections = this.clockwiseSections
@@ -423,6 +423,20 @@ class ShenandoahCar {
             sections = this.anticlockwiseSections
             rest = -1 * deltaAngle
         }
+        
+        let selectedOne: DrivingSection
+        sections.forEach(function (section: DrivingSection, key: number) {
+            selectedOne = section
+            if (rest < section.getKey() || rest <= 4) {
+                return
+            }
+            rest = this.driveSection(rest, section)
+        })
+        
+        RingbitCar.freestyle(selectedOne.getLeftWheelSpd(), selectedOne.getRightWheelSpd())
+        basic.pause(selectedOne.getDrivingTime() * rest)
+        RingbitCar.brake()
+        basic.pause(200)
     }
 
     private driveSection(distance: number, section: DrivingSection) {
