@@ -286,10 +286,16 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
+    private LEFT_ROTATION_SPD_QT = 14
+    private RIGHT_ROTATION_SPD_QT = -8
     private A90_MS_CLOCK = 670
     private A45_MS_CLOCK = 380
-    private A90_MS_ANTI = 660
+    private A90_MS_ANTI = 640
     private A45_MS_ANTI = 360
+    private A05_QS_CLOCK = 210
+    private A05_QS_ANTI = 200
+    private A01_QS_CLOCK = 42
+    private A01_QS_ANTI = 40
 
     /* Calibration Mode */
 
@@ -310,11 +316,15 @@ class ShenandoahCar {
         tmpArray = []
         tmpArray[90] = new DrivingSection(90, this.LEFT_ROTATION_SPD_MAX, this.RIGHT_ROTATION_SPD_MAX, this.A90_MS_CLOCK)
         tmpArray[45] = new DrivingSection(45, this.LEFT_ROTATION_SPD_MAX, this.RIGHT_ROTATION_SPD_MAX, this.A45_MS_CLOCK)
+        tmpArray[5] = new DrivingSection(5, this.LEFT_ROTATION_SPD_QT, this.RIGHT_ROTATION_SPD_QT, this.A05_QS_CLOCK)
+        tmpArray[1] = new DrivingSection(1, this.LEFT_ROTATION_SPD_QT, this.RIGHT_ROTATION_SPD_QT, this.A01_QS_CLOCK)
         this.clockwiseSections = tmpArray.sort((first, second) => 0 - (first.getKey() > second.getKey() ? 1 : -1))
 
         tmpArray = []
         tmpArray[90] = new DrivingSection(90, -1 * this.LEFT_ROTATION_SPD_MAX, -1 * this.RIGHT_ROTATION_SPD_MAX, this.A90_MS_ANTI)
         tmpArray[45] = new DrivingSection(45, -1 * this.LEFT_ROTATION_SPD_MAX, -1 * this.RIGHT_ROTATION_SPD_MAX, this.A45_MS_ANTI)
+        tmpArray[5] = new DrivingSection(5, -1 * this.LEFT_ROTATION_SPD_QT, -1 * this.RIGHT_ROTATION_SPD_QT, this.A05_QS_ANTI)
+        tmpArray[1] = new DrivingSection(1, -1 * this.LEFT_ROTATION_SPD_QT, -1 * this.RIGHT_ROTATION_SPD_QT, this.A01_QS_ANTI)
         this.anticlockwiseSections = tmpArray.sort((first, second) => 0 - (first.getKey() > second.getKey() ? 1 : -1))
     }
 
@@ -403,9 +413,16 @@ class ShenandoahCar {
             leftRot = -1 * this.LEFT_QUARTER_SPD
             rightRot = this.RIGHT_QUARTER_SPD
         }
-        RingbitCar.freestyle(leftRot, rightRot)
-        //basic.pause(20 * deltaAngle)
-        RingbitCar.brake()
+        let rest = 0
+        let sections = [{}]
+        if (deltaAngle == 0) { return }
+        if (deltaAngle > 0) {
+            sections = this.clockwiseSections
+            rest = deltaAngle
+        } else {
+            sections = this.anticlockwiseSections
+            rest = -1 * deltaAngle
+        }
     }
 
     private driveSection(distance: number, section: DrivingSection) {
