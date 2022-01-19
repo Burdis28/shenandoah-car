@@ -271,7 +271,7 @@ class ShenandoahCar {
     private RIGHT_HALF_SPD = 46
     private LEFT_QUARTER_SPD = 14
     private RIGHT_QUARTER_SPD = 8
-    private D100_HS_TIME = 820
+    private D100_HS_TIME = 800
     private D050_HS_TIME = 435
     private D020_HS_TIME = 280
     private D010_HS_TIME = 210
@@ -286,7 +286,7 @@ class ShenandoahCar {
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
-    private A90_MS_CLOCK = 690
+    private A90_MS_CLOCK = 670
     private A45_MS_CLOCK = 380
     private A90_MS_ANTI = 660
     private A45_MS_ANTI = 360
@@ -404,7 +404,7 @@ class ShenandoahCar {
             rightRot = this.RIGHT_QUARTER_SPD
         }
         RingbitCar.freestyle(leftRot, rightRot)
-        basic.pause(20 * deltaAngle)
+        //basic.pause(20 * deltaAngle)
         RingbitCar.brake()
     }
 
