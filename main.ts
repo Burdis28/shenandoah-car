@@ -193,20 +193,20 @@ class ShenandoahCar {
     
     private LEFT_HALF_SPD = 50
     private RIGHT_HALF_SPD = 46
-    private LEFT_QUARTER_SPD = 10
+    private LEFT_QUARTER_SPD = 14
     private RIGHT_QUARTER_SPD = 8
-    private D100_HS_TIME = 950
-    private D050_HS_TIME = 550
-    private D020_HS_TIME = 290
-    private D010_HS_TIME = 225
-    private D010_QT_TIME = 450
-    private D005_QT_TIME = 225
+    private D100_HS_TIME = 820
+    private D050_HS_TIME = 435
+    private D020_HS_TIME = 280
+    private D010_HS_TIME = 210
+    private D010_QT_TIME = 370
+    private D005_QT_TIME = 270
 
     private directDriveSections = [{}]
     private clockwiseSections = [{}]
     private anticlockwiseSections = [{}]
     
-    /* Rotation */
+    /* Rotation Mode */
 
     private LEFT_ROTATION_SPD_MAX = 50
     private RIGHT_ROTATION_SPD_MAX = -46
@@ -214,6 +214,10 @@ class ShenandoahCar {
     private A45_MS_CLOCK = 475
     private A90_MS_ANTI = 750
     private A45_MS_ANTI = 460
+
+    /* Calibration Mode */
+
+    private compassCalibration = false;
 
     private initDrivingSections() {
         let tmpArray  = []
@@ -235,9 +239,10 @@ class ShenandoahCar {
         this.anticlockwiseSections = tmpArray.sort((first, second) => 0 - (first.getKey() > second.getKey() ? 1 : -1))
     }
 
-    constructor() {
+    constructor(calibration?: boolean) {
         RingbitCar.init_wheel(AnalogPin.P1, AnalogPin.P2)
         this.initDrivingSections()
+        this.compassCalibration = calibration
     }
 
     /**
@@ -258,29 +263,6 @@ class ShenandoahCar {
      * @angle in [deg] (right now there are supported only multiples of 45°)
      */
     turn(angle: number) {        
-        /*if (angle == 90) {
-            RingbitCar.freestyle(50, -46)
-            basic.pause(840)
-            RingbitCar.brake()
-            basic.pause(200)
-        } else if (angle == -90) {
-            RingbitCar.freestyle(-50, 46)
-            basic.pause(750)
-            RingbitCar.brake()
-            basic.pause(200)
-        } else if (angle == 45) {
-            RingbitCar.freestyle(50, -46)
-            basic.pause(475)
-            RingbitCar.brake()
-            basic.pause(200)
-        } else if (angle == -45) {
-            RingbitCar.freestyle(-50, 46)
-            basic.pause(460)
-            RingbitCar.brake()
-            basic.pause(200)
-        } else {
-            basic.showIcon(IconNames.No)
-        }*/
         let rest = 0
         let sections = [{}]
         if (angle == 0) {return}
@@ -292,6 +274,9 @@ class ShenandoahCar {
             rest = -1 * angle
         }
         sections.forEach(function (section: DrivingSection, key: number) {
+            if (rest < section.getKey()) {
+                return
+            }
             rest = this.driveSection(rest, section)
         })
     }
@@ -308,42 +293,58 @@ class ShenandoahCar {
         }
         return rest
     }
+
+    penUp() {
+        pins.servoWritePin(AnalogPin.P0, 75)
+        basic.pause(200)
+    }
+
+    penDown() {
+        pins.servoWritePin(AnalogPin.P0, 10)
+        basic.pause(200)
+    }
+
+    stop() {
+        car.penUp()
+        RingbitCar.brake()
+    }
+
+    calibrationSequence() {
+        car.penDown()
+        car.drive(50)
+        car.turn(90)
+        car.drive(50)
+        car.turn(-90)
+        car.drive(50)
+        car.penUp()
+        car.turn(180)
+        car.drive(80)
+        car.penDown()
+        car.drive(30)
+        car.turn(45)
+        car.drive(40)
+        car.turn(-45)
+        car.drive(20)
+        car.stop()
+    }
 }
 
 let car = new ShenandoahCar()
 let SERIAL_LOGGING = true;
 /*
 input.onButtonPressed(Button.A, function () {
-    basic.showString("P")
-    basic.pause(1000)
-    basic.showString("R")
-    car.drive(170)
-    basic.clearScreen()
-})
-*/
-/*
-input.onButtonPressed(Button.A, function () {
-    basic.showString("A")
-    basic.pause(1000)
-    basic.showString("R")
-    car.turn(45)
-    basic.clearScreen()
+    car.penDown()
+    car.drive(50)
+    car.turn(90)
+    car.drive(50)
+    car.stop()
 })
 
 input.onButtonPressed(Button.B, function () {
-    RingbitCar.brake()
-})
-*/
-/*
-input.onButtonPressed(Button.A, function () {
-    car.drive(50)
-    car.drive(135)
-    car.drive(50)
-})
-
-input.onButtonPressed(Button.B, function () {
-    car.drive(50)
-    car.drive(-135)
-    car.drive(50)
+    car.penDown()
+    car.drive(100)
+    car.turn(-90)
+    car.drive(100)
+    car.stop()
 })
 */
