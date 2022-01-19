@@ -117,20 +117,52 @@ class CompassHistory {
         this.history.push(angle);
         this.correction.addAngle(angle);
     }
-    /**
-     * Returns azimuth angle with correction
-     * @dec number of decimal places
-     */
-    getAzimuth(dec: number) {
+
+    private _getAzimuth(dec: number) {
         if (this.getLength() < 1) return -100;
         let sum = 0;
         this.history.forEach(function (e) {
             sum += e;
         });
-        let delta2 = Math.round((sum * Math.pow(10, dec)) / this.getLength()) / Math.pow(10, dec);
-        logValue("d", delta2)
-        return delta2;
+        let delta = Math.round((sum * Math.pow(10, dec)) / this.getLength()) / Math.pow(10, dec);
+        logValue("d", delta)
+        return delta;
     }
+    /**
+     * Returns azimuth angle with correction
+     * @dec number of decimal places
+     */
+    getAzimuth(dec: number) {
+        let min = 500
+        let max = -500
+        let freq = -1
+        let ref = -1
+        this.correction.getAll().forEach(function(value, index){
+            if (min > index) { min = index }
+            if (max < index) { max = index }
+            if (freq < value[0]) {ref = index}
+        })
+        if (min >= 0) { 
+            return this._getAzimuth(dec)
+        }
+        if (max <= 359) {
+            return this._getAzimuth(dec)
+        }
+
+        let sum: number
+        let tmpIndex;
+        this.correction.getAll().forEach(function (value, index) {
+            if (ref >= 0) {                
+                tmpIndex = index < 0 ? index - 360 : index
+            } else {
+                tmpIndex = index > 340 ? index + 360 : index
+            }
+            sum = sum + tmpIndex * value[0]
+        })
+        let delta = Math.round((sum * Math.pow(10, dec)) / this.getLength()) / Math.pow(10, dec);
+        return sum
+    }
+
     private shiftCompassIcon(i: number) {        
         if (i % 500 == 0) {
             basic.showLeds(`
@@ -271,8 +303,8 @@ class ShenandoahCar {
         tmpArray[100] = new DrivingSection(100, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D100_HS_TIME)
         tmpArray[50]  = new DrivingSection( 50, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D050_HS_TIME)
         tmpArray[20]  = new DrivingSection( 20, this.LEFT_HALF_SPD, this.RIGHT_HALF_SPD, this.D020_HS_TIME)
-        tmpArray[10]  = new DrivingSection( 10, this.LEFT_QUARTER_SPD, this.RIGHT_QUARTER_SPD, this.D010_QT_TIME)
-        tmpArray[5]   = new DrivingSection(  5, this.LEFT_QUARTER_SPD, this.RIGHT_QUARTER_SPD, this.D005_QT_TIME)        
+        tmpArray[10] = new DrivingSection(10, this.LEFT_HALF_SPD, this.RIGHT_QUARTER_SPD, this.D010_HS_TIME)
+        tmpArray[5] = new DrivingSection(5, this.LEFT_QUARTER_SPD, this.RIGHT_HALF_SPD, this.D005_QT_TIME)
         this.directDriveSections = tmpArray.sort((first, second) => 0 - (first.getKey() > second.getKey() ? 1 : -1))
 
         tmpArray = []
